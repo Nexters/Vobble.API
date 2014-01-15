@@ -13,13 +13,13 @@ exports.init = function(app) {
 
 exports.register = function(sequelize) {
   var User = sequelize.import(__dirname + '/users')
-    , Voice = sequelize.import(__dirname + '/voices');
+    , Vobble = sequelize.import(__dirname + '/vobbles');
 
   // 유저-음성 1:M 관계
-  User.hasMany(Voice);
+  User.hasMany(Vobble);
 
   return {
     User: User,
-    Voice: Voice
+    Vobble: Vobble
   };
 };
