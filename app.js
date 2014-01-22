@@ -8,7 +8,10 @@ var express = require('express')
 if (app.get('env') === 'development') {
   app.set('config', require('./config/development.json'));
   app.set('port', process.env.PORT || 3000);
-  app.use(express.bodyParser());
+  app.use(express.limit('5mb'));
+  app.use(express.bodyParser({uploadDir: __dirname + '/files'}));
+  app.use(express.methodOverride());
+  app.use(express.logger({ buffer: 5000}));
   app.use(app.router);
   app.use(express.errorHandler());
 }
@@ -16,7 +19,10 @@ if (app.get('env') === 'development') {
 /* production 환경 설정 */
 if (app.get('env') === 'production') {
   app.set('port', process.env.PORT || 3000);
-  app.use(express.bodyParser());
+  app.use(express.limit('5mb'));
+  app.use(express.bodyParser({uploadDir: __dirname + '/files'}));
+  app.use(express.methodOverride());
+  app.use(express.logger({ buffer: 5000}));
   app.use(app.router);
   app.use(express.errorHandler());
 }

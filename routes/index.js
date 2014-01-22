@@ -9,16 +9,12 @@ var voidHandler = function(req, res) {
 };
 
 exports.init = function(app) {
-
   User = app.get('db').User;
   Vobble = app.get('db').Vobble;
 
-  /* 회원가입 (유저 생성) */
   app.post('/users', handlers.createUsers);
-
-  /* 로그인 (토큰 생성) */
   app.post('/tokens', handlers.createTokens);
-
+  app.post('/users/:userId/vobbles', handlers.createVobbles);
 };
 
 var handlers = exports.handlers = {
@@ -86,17 +82,69 @@ var handlers = exports.handlers = {
       } else {
         res.send(400, {
           result: 0,
-          msg: '회원 정보 없음',
-          user_id: -1,
-          token: -1
+          msg: '회원 정보 없음'
         });
       }
     }).error(function(err) {
       res.send(500, {
         result: 0,
-        msg: '서버 오류',
-        user_id: -1,
-        token: -1
+        msg: '서버 오류'
+      });
+    });
+  },
+
+  createVobbles: function(req, res) {
+    console.log('handler > createVobbles');
+
+    var userId = req.params.userId
+      , token = req.body.token
+      , latitude = req.body.latitude
+      , longitude = req.body.longitude
+      , voicePath = req.files.voice.path
+      , voiceName = voicePath.substring(voicePath.lastIndexOf('/') + 1)
+      , imagePath = req.files.image ? req.files.image.path : ''
+      , imageName = imagePath ? imagePath.substring(imagePath.lastIndexOf('/') + 1) : '';
+
+    User.find({ where: { token: token } }).success(function(user) {
+      if (user) {
+        if (userId === user.user_id + '') {
+          res.send(401, {
+            result: 0,
+            msg: '권한 없음'
+          });
+          return;
+        }
+
+        var data = {
+          user_id: userId,
+          voice_uri: voiceName,
+          image_uri: imageName,
+          latitude: latitude,
+          longitude: longitude
+        };
+
+        Vobble.create(data).success(function(vobble) {
+          res.send(200, {
+            result: 1,
+            msg: '보블 생성 성공',
+            vobble_id: vobble.vobble_id
+          });
+        }).error(function(err) {
+          res.send(500, {
+            result: 0,
+            msg: '데이터 저장 실패'
+          });
+        });
+      } else {
+        res.send(400, {
+          result: 0,
+          msg: '회원 정보 없음'
+        });
+      }
+    }).error(function(err) {
+      res.send(500, {
+        result: 0,
+        msg: '서버 오류'
       });
     });
   }
