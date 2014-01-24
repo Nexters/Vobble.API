@@ -107,7 +107,7 @@ var handlers = exports.handlers = {
 
     User.find({ where: { token: token } }).success(function(user) {
       if (user) {
-        if (userId === user.user_id + '') {
+        if (userId !== user.user_id + '') {
           res.send(401, {
             result: 0,
             msg: '권한 없음'
