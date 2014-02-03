@@ -1,6 +1,7 @@
 'use strict';
 
 var crypto = require('crypto')
+  , sequelize
   , User
   , Vobble;
 
@@ -9,18 +10,18 @@ var voidHandler = function(req, res) {
 };
 
 exports.init = function(app) {
+  sequelize = app.get('sequelize');
   User = app.get('db').User;
   Vobble = app.get('db').Vobble;
 
   app.post('/users', handlers.createUsers);
   app.post('/tokens', handlers.createTokens);
   app.post('/users/:userId/vobbles', handlers.createVobbles);
+  app.get('/vobbles', handlers.getVobbles);
 };
 
 var handlers = exports.handlers = {
   createUsers: function(req, res) {
-    console.log('handler > createUsers');
-
     var email = req.body.email
       , username = req.body.username
       , password = req.body.password;
@@ -66,8 +67,6 @@ var handlers = exports.handlers = {
   },
 
   createTokens: function(req, res) {
-    console.log('handler > createTokens');
-
     var email = req.body.email
       , password = req.body.password;
 
@@ -94,8 +93,6 @@ var handlers = exports.handlers = {
   },
 
   createVobbles: function(req, res) {
-    console.log('handler > createVobbles');
-
     var userId = req.params.userId
       , token = req.body.token
       , latitude = req.body.latitude
@@ -133,6 +130,50 @@ var handlers = exports.handlers = {
           res.send(500, {
             result: 0,
             msg: '데이터 저장 실패'
+          });
+        });
+      } else {
+        res.send(400, {
+          result: 0,
+          msg: '회원 정보 없음'
+        });
+      }
+    }).error(function(err) {
+      res.send(500, {
+        result: 0,
+        msg: '서버 오류'
+      });
+    });
+  },
+
+  getVobbles: function(req, res) {
+    var token = req.body.token
+      , pageNum = req.body.page_num
+      , latitude = req.body.latitude
+      , longitude = req.body.longitude;
+
+    User.find({ where: { token: token } }).success(function(user) {
+      if (user) {
+        var offset = (pageNum - 1) * 6
+          , limit = 6
+          , distance = 3 // 단위: km
+          , queryString = 'SELECT *, ( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
+                  ' * cos( radians( longitude ) - radians(' + longitude + ') ) + sin( radians(' + latitude + ') ) * sin( radians( latitude ) ) ) )' +
+                  ' AS distance FROM vobbles HAVING distance < ' + distance + ' ORDER BY distance LIMIT ' + offset + ', ' + limit;
+
+        sequelize.query(queryString, Vobble).success(function(vobbles) {
+          var vobblesValue = vobbles.map(function(vobble) {
+            return vobble.values;
+          });
+
+          res.send(200, {
+            result: 1,
+            data: vobblesValue
+          });
+        }).error(function(err) {
+          res.send(500, {
+            result: 0,
+            msg: '서버 오류'
           });
         });
       } else {

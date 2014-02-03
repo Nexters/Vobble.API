@@ -7,6 +7,7 @@ var Sequelize = require('sequelize')
 exports.init = function(app) {
   db = app.get('config').db
   sequelize = new Sequelize(db.database, db.username, db.password, db.options);
+  app.set('sequelize', sequelize);
   app.set('db', this.register(sequelize));
   sequelize.sync();
 };

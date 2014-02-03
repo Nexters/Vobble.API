@@ -49,7 +49,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('POST /users/:user_id/vobbles > ', function() {
+  describe('POST /users/:user_id/vobbles > ', function() {
     it('보블을 생성한다', function(done) {
       var testFilePath = __dirname + '/test_files'
         , voiceFilePath = testFilePath + '/voice_sample.mp3'
@@ -62,6 +62,28 @@ describe('Routing > ', function() {
         .field('longitude', '50.5')
         .attach('voice', voiceFilePath)
         .attach('image', imageFilePath)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          done();
+        });
+    });
+  });
+
+  describe.only('GET /vobbles > ', function() {
+    it('보블 정보를 반환한다', function(done) {
+      var data = {
+        token: testToken,
+        page_num: 1,
+        latitude: '20.22',
+        longitude: '50.5'
+      };
+
+      request(url)
+        .get('/vobbles')
+        .send(data)
         .end(function(err, res) {
           if (err) {
             throw err;
