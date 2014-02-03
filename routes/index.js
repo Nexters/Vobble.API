@@ -3,7 +3,8 @@
 var crypto = require('crypto')
   , sequelize
   , User
-  , Vobble;
+  , Vobble
+  , handlers;
 
 exports.init = function(app) {
   sequelize = app.get('sequelize');
@@ -23,7 +24,7 @@ function sendError(res, statusCode, errMsg) {
   });
 }
 
-var handlers = exports.handlers = {
+exports.handlers = handlers = {
   createUsers: function(req, res) {
     var email = req.body.email
       , username = req.body.username
@@ -38,14 +39,14 @@ var handlers = exports.handlers = {
                       .update(email + (new Date()).getTime() + 'vobble')
                       .digest('hex');
 
-        var user = {
+        var userData = {
           email: email,
           username: username,
           password: password,
           token: token
         };
 
-        User.create(user).success(function() {
+        User.create(userData).success(function() {
           res.send(200, {
             result: 1,
             msg: '회원 가입 성공'
@@ -141,6 +142,7 @@ var handlers = exports.handlers = {
             return vobble.values;
           });
 
+          // TODO: 응답 데이터에 paging 변수 포함
           res.send(200, {
             result: 1,
             data: vobblesValue
