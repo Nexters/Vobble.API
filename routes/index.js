@@ -5,10 +5,6 @@ var crypto = require('crypto')
   , User
   , Vobble;
 
-var voidHandler = function(req, res) {
-  res.send(404);
-};
-
 exports.init = function(app) {
   sequelize = app.get('sequelize');
   User = app.get('db').User;
@@ -20,6 +16,13 @@ exports.init = function(app) {
   app.get('/vobbles', handlers.getVobbles);
 };
 
+function sendError(res, statusCode, errMsg) {
+  res.send(statusCode, {
+    result: 0,
+    msg: errMsg
+  });
+}
+
 var handlers = exports.handlers = {
   createUsers: function(req, res) {
     var email = req.body.email
@@ -28,11 +31,7 @@ var handlers = exports.handlers = {
 
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
-        // TODO: 상태 코드 맞는지 확인
-        res.send(400, {
-          result: 0,
-          msg: '이미 가입된 회원'
-        });
+        sendError(res, 400, '이미 가입된 회원');
       } else {
         var token = crypto
                       .createHash('md5')
@@ -52,17 +51,11 @@ var handlers = exports.handlers = {
             msg: '회원 가입 성공'
           });
         }).error(function(err) {
-          res.send(500, {
-            result: 0,
-            msg: '서버 오류'
-          });
+          sendError(res, 500, '서버 오류');
         });
       }
     }).error(function(err) {
-      res.send(500, {
-        result: 0,
-        msg: '서버 오류'
-      });
+      sendError(res, 500, '서버 오류');
     });
   },
 
@@ -79,16 +72,10 @@ var handlers = exports.handlers = {
           token: user.token
         });
       } else {
-        res.send(400, {
-          result: 0,
-          msg: '회원 정보 없음'
-        });
+        sendError(res, 400, '회원 정보 없음');
       }
     }).error(function(err) {
-      res.send(500, {
-        result: 0,
-        msg: '서버 오류'
-      });
+      sendError(res, 500, '서버 오류');
     });
   },
 
@@ -105,10 +92,7 @@ var handlers = exports.handlers = {
     User.find({ where: { token: token } }).success(function(user) {
       if (user) {
         if (userId !== user.user_id + '') {
-          res.send(401, {
-            result: 0,
-            msg: '권한 없음'
-          });
+          sendError(res, 401, '권한 없음');
           return;
         }
 
@@ -127,22 +111,13 @@ var handlers = exports.handlers = {
             vobble_id: vobble.vobble_id
           });
         }).error(function(err) {
-          res.send(500, {
-            result: 0,
-            msg: '데이터 저장 실패'
-          });
+          sendError(res, 500, '데이터 저장 실패');
         });
       } else {
-        res.send(400, {
-          result: 0,
-          msg: '회원 정보 없음'
-        });
+        sendError(res, 400, '회원 정보 없음');
       }
     }).error(function(err) {
-      res.send(500, {
-        result: 0,
-        msg: '서버 오류'
-      });
+      sendError(res, 500, '서버 오류');
     });
   },
 
@@ -171,22 +146,13 @@ var handlers = exports.handlers = {
             data: vobblesValue
           });
         }).error(function(err) {
-          res.send(500, {
-            result: 0,
-            msg: '서버 오류'
-          });
+          sendError(res, 500, '서버 오류');
         });
       } else {
-        res.send(400, {
-          result: 0,
-          msg: '회원 정보 없음'
-        });
+        sendError(res, 400, '회원 정보 없음');
       }
     }).error(function(err) {
-      res.send(500, {
-        result: 0,
-        msg: '서버 오류'
-      });
+      sendError(res, 500, '서버 오류');
     });
   }
 };
