@@ -11,6 +11,7 @@ exports.init = function(app) {
   User = app.get('db').User;
   Vobble = app.get('db').Vobble;
 
+  app.get('/', handlers.index);
   app.post('/users', handlers.createUsers);
   app.post('/tokens', handlers.createTokens);
   app.post('/users/:userId/vobbles', handlers.createVobbles);
@@ -25,6 +26,10 @@ function sendError(res, statusCode, errMsg) {
 }
 
 exports.handlers = handlers = {
+  index: function(req, res) {
+    res.send(200, '살아있음');
+  },
+
   createUsers: function(req, res) {
     var email = req.body.email
       , username = req.body.username
