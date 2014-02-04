@@ -21,19 +21,19 @@ if (app.get('env') === 'development') {
 if (app.get('env') === 'test') {
   var dbUrl = url.parse(process.env.CLEARDB_DATABASE_URL);
   var testConfig = {
-    "db": {
-      "database": dbUrl.path.substr(1).split('?')[0],
-      "username": dbUrl.auth.split(':')[0],
-      "password": dbUrl.auth.split(':')[1],
-      "options": {
-        "host": dbUrl.hostname,
-        "port": dbUrl.port,
-        "logging": false,
-        "sync": { "force": false },
-        "define": {
-          "charset": "utf8",
-          "underscored": true,
-          "timestamps": true
+    'db': {
+      'database': dbUrl.path.substr(1).split('?')[0],
+      'username': dbUrl.auth.split(':')[0],
+      'password': dbUrl.auth.split(':')[1],
+      'options': {
+        'host': dbUrl.hostname,
+        'port': dbUrl.port,
+        'logging': false,
+        'sync': { 'force': false },
+        'define': {
+          'charset': 'utf8',
+          'underscored': true,
+          'timestamps': true
         }
       }
     }
