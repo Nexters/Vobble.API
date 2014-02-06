@@ -94,10 +94,24 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('GET /vobbles/count > ', function() {
+  describe('GET /vobbles/count > ', function() {
     it('모든 보블의 갯수를 반환한다', function(done) {
       request(url)
         .get('/vobbles/count')
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          done();
+        });
+    });
+  });
+
+  describe.only('GET /users/:user_id/vobbles/count > ', function() {
+    it('해당 유저의 모든 보블의 갯수를 반환한다', function(done) {
+      request(url)
+        .get('/users/' + testUserId + '/vobbles/count')
         .end(function(err, res) {
           if (err) {
             throw err;

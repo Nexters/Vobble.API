@@ -17,6 +17,7 @@ exports.init = function(app) {
   app.post('/users/:userId/vobbles', handlers.createVobbles);
   app.get('/vobbles', handlers.getVobbles);
   app.get('/vobbles/count', handlers.getVobblesCount);
+  app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
 };
 
 function sendError(res, statusCode, errMsg) {
@@ -165,14 +166,33 @@ exports.handlers = handlers = {
 
   getVobblesCount: function(req, res) {
     Vobble.findAll().success(function(vobbles) {
-      var count = vobbles.length;
-
       res.send(200, {
         result: 1,
-        count: count
+        count: vobbles.length
       });
     }).error(function(err) {
       sendError(res, 500, '서버 오류');
     });
+  },
+
+  getUserVobblesCount: function(req, res) {
+    var userId = req.params.user_id;
+
+    User.find(userId).success(function(user) {
+      if (user) {
+        Vobble.findAll({ where: { user_id: userId } }).success(function(vobbles) {
+          res.send(200, {
+            result: 1,
+            count: vobbles.length
+          });
+        }).error(function(err) {
+          sendError(res, 500, '서버 오류');
+        });
+      } else {
+        sendError(res, 404, '존재하지 않는 유저');
+      }
+    }).error(function(err) {
+      sendError(res, 500, '서버 오류');
+    })
   }
 };
