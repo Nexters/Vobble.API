@@ -62,10 +62,12 @@ exports.handlers = handlers = {
             msg: '회원 가입 성공'
           });
         }).error(function(err) {
+          console.error(err);
           sendError(res, 500, '서버 오류');
         });
       }
     }).error(function(err) {
+      console.error(err);
       sendError(res, 500, '서버 오류');
     });
   },
@@ -86,6 +88,7 @@ exports.handlers = handlers = {
         sendError(res, 400, '회원 정보 없음');
       }
     }).error(function(err) {
+      console.error(err);
       sendError(res, 500, '서버 오류');
     });
   },
@@ -122,12 +125,14 @@ exports.handlers = handlers = {
             vobble_id: vobble.vobble_id
           });
         }).error(function(err) {
+          console.error(err);
           sendError(res, 500, '데이터 저장 실패');
         });
       } else {
         sendError(res, 400, '회원 정보 없음');
       }
     }).error(function(err) {
+      console.error(err);
       sendError(res, 500, '서버 오류');
     });
   },
@@ -153,6 +158,7 @@ exports.handlers = handlers = {
         vobbles: vobblesValue
       });
     }).error(function(err) {
+      console.error(err);
       sendError(res, 500, '서버 오류');
     });
   },
@@ -164,6 +170,7 @@ exports.handlers = handlers = {
         count: vobbles.length
       });
     }).error(function(err) {
+      console.error(err);
       sendError(res, 500, '서버 오류');
     });
   },
@@ -190,6 +197,7 @@ exports.handlers = handlers = {
         vobbles: vobblesValue
       });
     }).error(function(err) {
+      console.error(err);
       sendError(res, 500, '서버 오류');
     });
   },
@@ -205,12 +213,14 @@ exports.handlers = handlers = {
             count: vobbles.length
           });
         }).error(function(err) {
+          console.error(err);
           sendError(res, 500, '서버 오류');
         });
       } else {
         sendError(res, 404, '존재하지 않는 유저');
       }
     }).error(function(err) {
+      console.error(err);
       sendError(res, 500, '서버 오류');
     })
   }
