@@ -14,9 +14,12 @@ exports.init = function(app) {
   app.get('/', handlers.index);
   app.post('/users', handlers.createUsers);
   app.post('/tokens', handlers.createTokens);
-  app.post('/users/:userId/vobbles', handlers.createVobbles);
+
   app.get('/vobbles', handlers.getVobbles);
   app.get('/vobbles/count', handlers.getVobblesCount);
+
+  app.post('/users/:userId/vobbles', handlers.createVobbles);
+  app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
   app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
 };
 
@@ -159,6 +162,32 @@ exports.handlers = handlers = {
       res.send(200, {
         result: 1,
         count: vobbles.length
+      });
+    }).error(function(err) {
+      sendError(res, 500, '서버 오류');
+    });
+  },
+
+  getUserVobbles: function(req, res) {
+    var latitude = req.body.latitude
+      , longitude = req.body.longitude
+      , limit = req.body.limit ? req.body.limit : 6
+      , userId = req.params.user_id;
+
+    var queryString = 'SELECT *, ' +
+                      '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
+                      ' * cos( radians( longitude ) - radians(' + longitude + ') ) + sin( radians(' + latitude +
+                      ') ) * sin( radians( latitude ) ) ) ) ' +
+                      'AS distance FROM vobbles WHERE user_id = ' + userId + ' ORDER BY distance LIMIT 0, ' + limit;
+
+    sequelize.query(queryString, Vobble).success(function(vobbles) {
+      var vobblesValue = vobbles.map(function(vobble) {
+        return vobble.values;
+      });
+
+      res.send(200, {
+        result: 1,
+        vobbles: vobblesValue
       });
     }).error(function(err) {
       sendError(res, 500, '서버 오류');

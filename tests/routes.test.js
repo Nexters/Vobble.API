@@ -72,7 +72,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('GET /vobbles > ', function() {
+  describe('GET /vobbles > ', function() {
     it('보블 정보를 반환한다', function(done) {
       var data = {
         latitude: '20.22',
@@ -96,6 +96,27 @@ describe('Routing > ', function() {
     it('모든 보블의 갯수를 반환한다', function(done) {
       request(url)
         .get('/vobbles/count')
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          done();
+        });
+    });
+  });
+
+  describe.only('GET /users/:user_id/vobbles > ', function() {
+    it('해당 유저의 보블 중 현재 위치에서 가장 가까운 n개의 보블 정보를 반환한다', function(done) {
+      var data = {
+        latitude: '20.22',
+        longitude: '50.5',
+        limit: 6
+      };
+
+      request(url)
+        .get('/users/' + testUserId + '/vobbles')
+        .send(data)
         .end(function(err, res) {
           if (err) {
             throw err;
