@@ -16,6 +16,7 @@ exports.init = function(app) {
   app.post('/tokens', handlers.createTokens);
   app.post('/users/:userId/vobbles', handlers.createVobbles);
   app.get('/vobbles', handlers.getVobbles);
+  app.get('/vobbles/count', handlers.getVobblesCount);
 };
 
 function sendError(res, statusCode, errMsg) {
@@ -147,7 +148,6 @@ exports.handlers = handlers = {
             return vobble.values;
           });
 
-          // TODO: 응답 데이터에 paging 변수 포함
           res.send(200, {
             result: 1,
             data: vobblesValue
@@ -158,6 +158,19 @@ exports.handlers = handlers = {
       } else {
         sendError(res, 400, '회원 정보 없음');
       }
+    }).error(function(err) {
+      sendError(res, 500, '서버 오류');
+    });
+  },
+
+  getVobblesCount: function(req, res) {
+    Vobble.findAll().success(function(vobbles) {
+      var count = vobbles.length;
+
+      res.send(200, {
+        result: 1,
+        count: count
+      });
     }).error(function(err) {
       sendError(res, 500, '서버 오류');
     });

@@ -72,7 +72,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('GET /vobbles > ', function() {
+  describe('GET /vobbles > ', function() {
     it('보블 정보를 반환한다', function(done) {
       var data = {
         token: testToken,
@@ -84,6 +84,20 @@ describe('Routing > ', function() {
       request(url)
         .get('/vobbles')
         .send(data)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          done();
+        });
+    });
+  });
+
+  describe.only('GET /vobbles/count > ', function() {
+    it('모든 보블의 갯수를 반환한다', function(done) {
+      request(url)
+        .get('/vobbles/count')
         .end(function(err, res) {
           if (err) {
             throw err;
