@@ -72,11 +72,9 @@ describe('Routing > ', function() {
     });
   });
 
-  describe('GET /vobbles > ', function() {
+  describe.only('GET /vobbles > ', function() {
     it('보블 정보를 반환한다', function(done) {
       var data = {
-        token: testToken,
-        page_num: 1,
         latitude: '20.22',
         longitude: '50.5'
       };
@@ -108,7 +106,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('GET /users/:user_id/vobbles/count > ', function() {
+  describe('GET /users/:user_id/vobbles/count > ', function() {
     it('해당 유저의 모든 보블의 갯수를 반환한다', function(done) {
       request(url)
         .get('/users/' + testUserId + '/vobbles/count')

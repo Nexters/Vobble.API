@@ -130,35 +130,25 @@ exports.handlers = handlers = {
   },
 
   getVobbles: function(req, res) {
-    var token = req.body.token
-      , pageNum = req.body.page_num
-      , latitude = req.body.latitude
-      , longitude = req.body.longitude;
+    var latitude = req.body.latitude
+      , longitude = req.body.longitude
+      , limit = req.body.limit ? req.body.limit : 6;
 
-    User.find({ where: { token: token } }).success(function(user) {
-      if (user) {
-        var offset = (pageNum - 1) * 6
-          , limit = 6
-          , distance = 3 // 단위: km
-          , queryString = 'SELECT *, ( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
-                  ' * cos( radians( longitude ) - radians(' + longitude + ') ) + sin( radians(' + latitude + ') ) * sin( radians( latitude ) ) ) )' +
-                  ' AS distance FROM vobbles HAVING distance < ' + distance + ' ORDER BY distance LIMIT ' + offset + ', ' + limit;
+    var queryString = 'SELECT *, ' +
+                      '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
+                      ' * cos( radians( longitude ) - radians(' + longitude + ') ) + sin( radians(' + latitude +
+                      ') ) * sin( radians( latitude ) ) ) ) ' +
+                      'AS distance FROM vobbles ORDER BY distance LIMIT 0, ' + limit;
 
-        sequelize.query(queryString, Vobble).success(function(vobbles) {
-          var vobblesValue = vobbles.map(function(vobble) {
-            return vobble.values;
-          });
+    sequelize.query(queryString, Vobble).success(function(vobbles) {
+      var vobblesValue = vobbles.map(function(vobble) {
+        return vobble.values;
+      });
 
-          res.send(200, {
-            result: 1,
-            data: vobblesValue
-          });
-        }).error(function(err) {
-          sendError(res, 500, '서버 오류');
-        });
-      } else {
-        sendError(res, 400, '회원 정보 없음');
-      }
+      res.send(200, {
+        result: 1,
+        vobbles: vobblesValue
+      });
     }).error(function(err) {
       sendError(res, 500, '서버 오류');
     });
