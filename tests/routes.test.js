@@ -106,7 +106,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('GET /users/:user_id/vobbles > ', function() {
+  describe('GET /users/:user_id/vobbles > ', function() {
     it('해당 유저의 보블 중 현재 위치에서 가장 가까운 n개의 보블 정보를 반환한다', function(done) {
       var data = {
         latitude: '20.22',
@@ -135,6 +135,23 @@ describe('Routing > ', function() {
           if (err) {
             throw err;
           }
+          res.should.have.status(200);
+          done();
+        });
+    });
+  });
+
+  describe.only('GET /files/:filename > ', function() {
+    it('파일을 다운로드한다', function(done) {
+      var filename = '1272-1ehzon9.mp3';
+
+      request(url)
+        .get('/files/' + filename)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          console.log(res);
           res.should.have.status(200);
           done();
         });

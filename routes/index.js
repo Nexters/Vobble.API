@@ -1,6 +1,7 @@
 'use strict';
 
 var crypto = require('crypto')
+  , path = require('path')
   , sequelize
   , User
   , Vobble
@@ -21,6 +22,8 @@ exports.init = function(app) {
   app.post('/users/:userId/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
   app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
+
+  app.get('/files/:filename', handlers.downloadFile);
 };
 
 function sendError(res, statusCode, errMsg) {
@@ -223,5 +226,12 @@ exports.handlers = handlers = {
       console.error(err);
       sendError(res, 500, '서버 오류');
     })
+  },
+
+  downloadFile: function(req, res) {
+    var filename = req.params.filename
+      , filepath = path.join(__dirname, '../files', filename);
+
+    res.download(filepath);
   }
 };
