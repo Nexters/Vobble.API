@@ -59,7 +59,7 @@ exports.handlers = handlers = {
           token: token
         };
 
-        User.create(userData).success(function() {
+        User.create(userData).success(function(user) {
           res.send(200, {
             result: 1,
             msg: '회원 가입 성공'
@@ -79,13 +79,19 @@ exports.handlers = handlers = {
     var email = req.body.email
       , password = req.body.password;
 
-    User.find({ where: { email: email, password: password } }).success(function(user) {
+    User.find({ where: { email: email } }).success(function(user) {
       if (user) {
-        res.send(200, {
-          result: 1,
-          msg: '로그인 성공',
-          user_id: user.user_id,
-          token: user.token
+        user.verifyPassword(password, function(err, result) {
+          if (!result) {
+            sendError(res, 400, '패스워드 오류');
+          } else {
+            res.send(200, {
+              result: 1,
+              msg: '로그인 성공',
+              user_id: user.user_id,
+              token: user.token
+            });
+          }
         });
       } else {
         sendError(res, 400, '회원 정보 없음');

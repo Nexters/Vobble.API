@@ -29,7 +29,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe('POST /tokens > ', function() {
+  describe.only('POST /tokens > ', function() {
     it('유저 정보를 올바르게 입력하면 로그인에 성공하고 user_id 와 token을 반환한다', function(done) {
       var data = {
         email: 'test@vobble.com',
@@ -141,7 +141,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('GET /files/:filename > ', function() {
+  describe('GET /files/:filename > ', function() {
     it('파일을 다운로드한다', function(done) {
       var filename = '1272-1ehzon9.mp3';
 
