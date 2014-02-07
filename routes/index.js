@@ -147,14 +147,14 @@ exports.handlers = handlers = {
   },
 
   getVobbles: function(req, res) {
-    var latitude = req.body.latitude
-      , longitude = req.body.longitude
+    var latitude = req.query.latitude
+      , longitude = req.query.longitude
       , limit = req.body.limit ? req.body.limit : 6;
-
+      
     var queryString = 'SELECT *, ' +
-                      '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
-                      ' * cos( radians( longitude ) - radians(' + longitude + ') ) + sin( radians(' + latitude +
-                      ') ) * sin( radians( latitude ) ) ) ) ' +
+                      '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians(' + latitude + ') )' +
+                      ' * cos( radians('+ longitude +') - radians(' + longitude + ') ) + sin( radians(' + latitude +
+                      ') ) * sin( radians(' + latitude + ') ) ) ) ' +
                       'AS distance FROM vobbles ORDER BY distance LIMIT 0, ' + limit;
 
     sequelize.query(queryString, Vobble).success(function(vobbles) {
