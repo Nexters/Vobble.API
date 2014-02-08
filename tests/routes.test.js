@@ -6,7 +6,7 @@ var should = require('should')
 describe('Routing > ', function() {
   var url = 'http://localhost:3000'
     , testUserId = '1'
-    , testToken = '2c5876d0ce28fcbf018b2d3e4459e9a9';
+    , testToken = '6d48cc80b4a4009471025d48a7043f17';
 
   describe('POST /users > ', function() {
     it('유저 정보를 올바르게 입력하면 회원가입이 정상적으로 처리된다', function(done) {
