@@ -29,7 +29,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('POST /tokens > ', function() {
+  describe('POST /tokens > ', function() {
     it('유저 정보를 올바르게 입력하면 로그인에 성공하고 user_id 와 token을 반환한다', function(done) {
       var data = {
         email: 'test@vobble.com',
@@ -49,7 +49,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe('POST /users/:user_id/vobbles > ', function() {
+  describe.only('POST /users/:user_id/vobbles > ', function() {
     it('보블을 생성한다', function(done) {
       var testFilePath = __dirname + '/test_files'
         , voiceFilePath = testFilePath + '/voice_sample.mp3'

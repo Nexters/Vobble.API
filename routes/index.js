@@ -2,6 +2,7 @@
 
 var crypto = require('crypto')
   , path = require('path')
+  , fs = require('fs')
   , sequelize
   , User
   , Vobble
@@ -112,6 +113,10 @@ exports.handlers = handlers = {
       , imagePath = req.files.image ? req.files.image.path : ''
       , imageName = imagePath ? imagePath.substring(imagePath.lastIndexOf('/') + 1) : '';
 
+    console.log(voicePath);
+    console.log(imagePath);
+    console.log(path.join(__dirname, '../files'));
+
     User.find({ where: { token: token } }).success(function(user) {
       if (user) {
         if (userId !== user.user_id + '') {
@@ -150,7 +155,7 @@ exports.handlers = handlers = {
     var latitude = req.query.latitude
       , longitude = req.query.longitude
       , limit = req.body.limit ? req.body.limit : 6;
-      
+
     var queryString = 'SELECT *, ' +
                       '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians(' + latitude + ') )' +
                       ' * cos( radians('+ longitude +') - radians(' + longitude + ') ) + sin( radians(' + latitude +
