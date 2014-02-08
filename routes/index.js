@@ -115,39 +115,55 @@ exports.handlers = handlers = {
 
     console.log(voicePath);
     console.log(imagePath);
-    console.log(path.join(__dirname, '../files'));
 
-    User.find({ where: { token: token } }).success(function(user) {
-      if (user) {
-        if (userId !== user.user_id + '') {
-          sendError(res, 401, '권한 없음');
+    fs.readFile(voicePath, function (err, data) {
+      if (err) {
+        console.log('Error read file: ' + voicePath);
+        console.log(err);
+        sendError(res, 400, '에러');
+        return;
+      }
+      var newPath = path.join(__dirname, '../public/uploads/' + voiceName);
+      fs.writeFile(newPath, data, function (err) {
+        if (err) {
+          console.log('Error write file: ' + newPath);
+          console.log(err);
+          sendError(res, 400, '에러');
           return;
         }
+        User.find({ where: { token: token } }).success(function(user) {
+          if (user) {
+            if (userId !== user.user_id + '') {
+              sendError(res, 401, '권한 없음');
+              return;
+            }
 
-        var data = {
-          user_id: userId,
-          voice_uri: voiceName,
-          image_uri: imageName,
-          latitude: latitude,
-          longitude: longitude
-        };
+            var data = {
+              user_id: userId,
+              voice_uri: voiceName,
+              image_uri: imageName,
+              latitude: latitude,
+              longitude: longitude
+            };
 
-        Vobble.create(data).success(function(vobble) {
-          res.send(200, {
-            result: 1,
-            msg: '보블 생성 성공',
-            vobble_id: vobble.vobble_id
-          });
+            Vobble.create(data).success(function(vobble) {
+              res.send(200, {
+                result: 1,
+                msg: '보블 생성 성공',
+                vobble_id: vobble.vobble_id
+              });
+            }).error(function(err) {
+              console.error(err);
+              sendError(res, 500, '데이터 저장 실패');
+            });
+          } else {
+            sendError(res, 400, '회원 정보 없음');
+          }
         }).error(function(err) {
           console.error(err);
-          sendError(res, 500, '데이터 저장 실패');
+          sendError(res, 500, '서버 오류');
         });
-      } else {
-        sendError(res, 400, '회원 정보 없음');
-      }
-    }).error(function(err) {
-      console.error(err);
-      sendError(res, 500, '서버 오류');
+      });
     });
   },
 
@@ -241,7 +257,7 @@ exports.handlers = handlers = {
 
   downloadFile: function(req, res) {
     var filename = req.params.filename
-      , filepath = path.join(__dirname, '../files', filename);
+      , filepath = path.join(__dirname, '../public/uploads', filename);
 
     res.download(filepath);
   }

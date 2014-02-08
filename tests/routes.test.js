@@ -72,6 +72,29 @@ describe('Routing > ', function() {
     });
   });
 
+  describe('POST http://vobble.herokuapp.com/users/:user_id/vobbles > ', function() {
+    it('보블을 생성한다', function(done) {
+      var testFilePath = __dirname + '/test_files'
+        , voiceFilePath = testFilePath + '/voice_sample.mp3'
+        , imageFilePath = testFilePath + '/image_sample.png';
+
+      request('http://vobble.herokuapp.com')
+        .post('/users/1/vobbles')
+        .field('token', "cce726145325834fde22f9b2b8f153e0")
+        .field('latitude', '20.22')
+        .field('longitude', '50.5')
+        .attach('voice', voiceFilePath)
+        .attach('image', imageFilePath)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          done();
+        });
+    });
+  });
+
   describe('GET /vobbles > ', function() {
     it('보블 정보를 반환한다', function(done) {
       var data = {
