@@ -104,6 +104,8 @@ exports.handlers = handlers = {
   },
 
   createVobbles: function(req, res) {
+    console.log('POST /users/:user_id/vobbles');
+
     var userId = req.params.userId
       , token = req.body.token
       , latitude = req.body.latitude
