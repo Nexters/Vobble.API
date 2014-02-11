@@ -49,7 +49,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe('POST /users/:user_id/vobbles > ', function() {
+  describe.only('POST /users/:user_id/vobbles > ', function() {
     it('보블을 생성한다', function(done) {
       var testFilePath = __dirname + '/test_files'
         , voiceFilePath = testFilePath + '/voice_sample.mp3'
@@ -72,7 +72,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('POST http://vobble.herokuapp.com/users/:user_id/vobbles > ', function() {
+  describe('POST http://vobble.herokuapp.com/users/:user_id/vobbles > ', function() {
     it('보블을 생성한다', function(done) {
       var testFilePath = __dirname + '/test_files'
         , voiceFilePath = testFilePath + '/voice_sample.mp3'

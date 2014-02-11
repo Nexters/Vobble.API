@@ -20,7 +20,7 @@ exports.init = function(app) {
   app.get('/vobbles', handlers.getVobbles);
   app.get('/vobbles/count', handlers.getVobblesCount);
 
-  app.post('/users/:userId/vobbles', handlers.createVobbles);
+  app.post('/users/:user_id/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
   app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
 
@@ -106,7 +106,7 @@ exports.handlers = handlers = {
   createVobbles: function(req, res) {
     console.log('POST /users/:user_id/vobbles');
 
-    var userId = req.params.userId
+    var userId = req.params.user_id
       , token = req.body.token
       , latitude = req.body.latitude
       , longitude = req.body.longitude
@@ -118,6 +118,7 @@ exports.handlers = handlers = {
     User.find({ where: { token: token } }).success(function(user) {
       if (user) {
         if (userId !== user.user_id + '') {
+          console.error('권한 없음');
           sendError(res, 401, '권한 없음');
           return;
         }
@@ -141,6 +142,7 @@ exports.handlers = handlers = {
           sendError(res, 500, '데이터 저장 실패');
         });
       } else {
+        console.error('회원 정보 없음');
         sendError(res, 400, '회원 정보 없음');
       }
     }).error(function(err) {
@@ -239,7 +241,7 @@ exports.handlers = handlers = {
 
   downloadFile: function(req, res) {
     var filename = req.params.filename
-      , filepath = path.join(__dirname, '../public/uploads', filename);
+      , filepath = path.join(__dirname, '../files', filename);
 
     res.download(filepath);
   }
