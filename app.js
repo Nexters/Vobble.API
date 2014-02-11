@@ -2,19 +2,13 @@
 
 var express = require('express')
   , app = express()
-  , url = require('url');
+  , url = require('url')
+  , uploadDir = __dirname + '/files';
 
 
 /* development 환경 설정 */
 if (app.get('env') === 'development') {
   app.set('config', require('./config/development.json'));
-  app.set('port', process.env.PORT || 3000);
-  app.use(express.limit('5mb'));
-  app.use(express.bodyParser({uploadDir: __dirname + '/files'}));
-  app.use(express.methodOverride());
-  app.use(express.logger({ buffer: 5000}));
-  app.use(app.router);
-  app.use(express.errorHandler());
 }
 
 /* test 환경 설정 - heroku */
@@ -39,25 +33,27 @@ if (app.get('env') === 'test') {
     }
   };
   app.set('config', testConfig);
-  app.set('port', process.env.PORT || 3000);
-  app.use(express.limit('5mb'));
-  app.use(express.bodyParser({uploadDir: __dirname + '/files'}));
-  app.use(express.methodOverride());
-  app.use(express.logger({ buffer: 5000}));
-  app.use(app.router);
-  app.use(express.errorHandler());
 }
 
 /* production 환경 설정 */
 if (app.get('env') === 'production') {
-  app.set('port', process.env.PORT || 3000);
-  app.use(express.limit('5mb'));
-  app.use(express.bodyParser({uploadDir: __dirname + '/files'}));
-  app.use(express.methodOverride());
-  app.use(express.logger({ buffer: 5000}));
-  app.use(app.router);
-  app.use(express.errorHandler());
+
 }
+
+/* 공통 환경 설정 */
+app.set('port', process.env.PORT || 3000);
+app.use(express.limit('5mb'));
+app.use(express.bodyParser({uploadDir: uploadDir}));
+app.use(express.methodOverride());
+app.use(express.logger({ buffer: 5000}));
+app.use(app.router);
+app.use(express.errorHandler());
+
+fs.exists(uploadDir, function (exist) {
+  if (!exist) {
+    fs.mkdir(uploadDir);
+  }
+});
 
 /* 데이터 모델 설정 */
 require('./models').init(app);
