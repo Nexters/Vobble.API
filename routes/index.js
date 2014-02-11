@@ -40,6 +40,8 @@ exports.handlers = handlers = {
   },
 
   createUsers: function(req, res) {
+    console.log('POST /users');
+
     var email = req.body.email
       , username = req.body.username
       , password = req.body.password;
