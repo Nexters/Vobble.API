@@ -3,6 +3,7 @@
 var express = require('express')
   , app = express()
   , url = require('url')
+  , fs = require('fs')
   , uploadDir = __dirname + '/files';
 
 
