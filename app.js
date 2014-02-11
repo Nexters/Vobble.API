@@ -50,8 +50,10 @@ app.use(express.logger({ buffer: 5000}));
 app.use(app.router);
 app.use(express.errorHandler());
 
+console.log('Check upload directory exists');
 fs.exists(uploadDir, function (exist) {
   if (!exist) {
+    console.log('Make upload directory exists');
     fs.mkdir(uploadDir);
   }
 });
