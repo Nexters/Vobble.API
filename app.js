@@ -6,7 +6,7 @@ var express = require('express')
   , fs = require('fs')
   , uploadDir = __dirname + '/files';
 
-/* development 환경 설정 */
+/* 로컬 개발 환경 설정 */
 if (app.get('env') === 'development') {
   app.set('config', require('./config/development.json'));
 }
@@ -16,7 +16,7 @@ if (app.get('env') === 'test') {
   app.set('config', require('./config/test.json'));
 }
 
-/* production 환경 설정 */
+/* 실 서버 환경 설정 */
 if (app.get('env') === 'production') {
 
 }

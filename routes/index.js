@@ -61,7 +61,7 @@ exports.handlers = handlers = {
         };
 
         User.create(userData).success(function(user) {
-          res.send(200, { result: 1 });
+          res.send(200, { result: 1, user_id: user.values.user_id });
         }).error(function(err) {
           console.error(err);
           sendError(res, '서버 오류');
@@ -128,7 +128,6 @@ exports.handlers = handlers = {
         Vobble.create(data).success(function(vobble) {
           res.send(200, {
             result: 1,
-            msg: '보블 생성 성공',
             vobble_id: vobble.vobble_id
           });
         }).error(function(err) {
@@ -146,8 +145,8 @@ exports.handlers = handlers = {
   },
 
   getVobbles: function(req, res) {
-    var latitude = req.query.latitude
-      , longitude = req.query.longitude
+    var latitude = req.body.latitude
+      , longitude = req.body.longitude
       , limit = req.body.limit ? req.body.limit : 6;
 
     var queryString = 'SELECT *, ' +
