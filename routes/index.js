@@ -40,15 +40,13 @@ exports.handlers = handlers = {
   },
 
   createUsers: function(req, res) {
-    console.log('POST /users');
-
     var email = req.body.email
       , username = req.body.username
       , password = req.body.password;
 
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
-        sendError(res, 400, '이미 가입된 회원');
+        sendError(res, 400, '이메일이 존재합니다. 해당 이메일로 로그인하시거나 다른 이메일로 가입 해주세요.');
       } else {
         var token = crypto
                       .createHash('md5')
@@ -106,8 +104,6 @@ exports.handlers = handlers = {
   },
 
   createVobbles: function(req, res) {
-    console.log('POST /users/:user_id/vobbles');
-
     var userId = req.params.user_id
       , token = req.body.token
       , latitude = req.body.latitude
@@ -127,8 +123,8 @@ exports.handlers = handlers = {
 
         var data = {
           user_id: userId,
-          voice_uri: '1272-1ehzon9.mp3',
-          image_uri: '1272-vxeyeq.png',
+          voice_uri: voiceName,
+          image_uri: imageName,
           latitude: latitude,
           longitude: longitude
         };

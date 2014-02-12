@@ -72,7 +72,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('POST http://vobble.herokuapp.com/users/:user_id/vobbles > ', function() {
+  describe('POST http://vobble.herokuapp.com/users/:user_id/vobbles > ', function() {
     it('보블을 생성한다', function(done) {
       var testFilePath = __dirname + '/test_files'
         , voiceFilePath = testFilePath + '/voice_sample.mp3'
@@ -151,7 +151,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe('GET /users/:user_id/vobbles/count > ', function() {
+  describe.only('GET /users/:user_id/vobbles/count > ', function() {
     it('해당 유저의 모든 보블의 갯수를 반환한다', function(done) {
       request(url)
         .get('/users/' + testUserId + '/vobbles/count')
@@ -167,7 +167,7 @@ describe('Routing > ', function() {
 
   describe('GET /files/:filename > ', function() {
     it('파일을 다운로드한다', function(done) {
-      var filename = '1272-1ehzon9.mp3';
+      var filename = '1043-1tqygra.mp3';
 
       request(url)
         .get('/files/' + filename)
@@ -175,7 +175,6 @@ describe('Routing > ', function() {
           if (err) {
             throw err;
           }
-          console.log(res);
           res.should.have.status(200);
           done();
         });

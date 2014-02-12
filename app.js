@@ -6,34 +6,14 @@ var express = require('express')
   , fs = require('fs')
   , uploadDir = __dirname + '/files';
 
-
 /* development 환경 설정 */
 if (app.get('env') === 'development') {
   app.set('config', require('./config/development.json'));
 }
 
-/* test 환경 설정 - heroku */
+/* 테스트 서버 환경 설정 */
 if (app.get('env') === 'test') {
-  var dbUrl = url.parse(process.env.CLEARDB_DATABASE_URL);
-  var testConfig = {
-    'db': {
-      'database': dbUrl.path.substr(1).split('?')[0],
-      'username': dbUrl.auth.split(':')[0],
-      'password': dbUrl.auth.split(':')[1],
-      'options': {
-        'host': dbUrl.hostname,
-        'port': dbUrl.port,
-        'logging': false,
-        'sync': { 'force': false },
-        'define': {
-          'charset': 'utf8',
-          'underscored': true,
-          'timestamps': true
-        }
-      }
-    }
-  };
-  app.set('config', testConfig);
+  app.set('config', require('./config/test.json'));
 }
 
 /* production 환경 설정 */
@@ -50,10 +30,8 @@ app.use(express.logger({ buffer: 5000}));
 app.use(app.router);
 app.use(express.errorHandler());
 
-console.log('Check upload directory exists');
 fs.exists(uploadDir, function (exist) {
   if (!exist) {
-    console.log('Make upload directory exists');
     fs.mkdir(uploadDir);
   }
 });
