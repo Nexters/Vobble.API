@@ -27,8 +27,8 @@ exports.init = function(app) {
   app.get('/files/:filename', handlers.downloadFile);
 };
 
-function sendError(res, statusCode, errMsg) {
-  res.send(statusCode, {
+function sendError(res, errMsg) {
+  res.send(200, {
     result: 0,
     msg: errMsg
   });
@@ -46,7 +46,7 @@ exports.handlers = handlers = {
 
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
-        sendError(res, 400, '이메일이 존재합니다. 해당 이메일로 로그인하시거나 다른 이메일로 가입 해주세요.');
+        sendError(res, '이메일이 존재합니다. 해당 이메일로 로그인하시거나 다른 이메일로 가입 해주세요.');
       } else {
         var token = crypto
                       .createHash('md5')
@@ -61,18 +61,15 @@ exports.handlers = handlers = {
         };
 
         User.create(userData).success(function(user) {
-          res.send(200, {
-            result: 1,
-            msg: '회원 가입 성공'
-          });
+          res.send(200, { result: 1 });
         }).error(function(err) {
           console.error(err);
-          sendError(res, 500, '서버 오류');
+          sendError(res, '서버 오류');
         });
       }
     }).error(function(err) {
       console.error(err);
-      sendError(res, 500, '서버 오류');
+      sendError(res, '서버 오류');
     });
   },
 
@@ -84,22 +81,21 @@ exports.handlers = handlers = {
       if (user) {
         user.verifyPassword(password, function(err, result) {
           if (!result) {
-            sendError(res, 400, '패스워드 오류');
+            sendError(res, '패스워드가 일치하지 않습니다. 다시 확인해 주세요.');
           } else {
             res.send(200, {
               result: 1,
-              msg: '로그인 성공',
               user_id: user.user_id,
               token: user.token
             });
           }
         });
       } else {
-        sendError(res, 400, '회원 정보 없음');
+        sendError(res, '정보자 존재하지 않습니다. 회원가입 후 로그인 해주세요.');
       }
     }).error(function(err) {
       console.error(err);
-      sendError(res, 500, '서버 오류');
+      sendError(res, '서버 오류');
     });
   },
 
@@ -117,7 +113,7 @@ exports.handlers = handlers = {
       if (user) {
         if (userId !== user.user_id + '') {
           console.error('권한 없음');
-          sendError(res, 401, '권한 없음');
+          sendError(res, '권한이 없습니다.');
           return;
         }
 
@@ -137,15 +133,15 @@ exports.handlers = handlers = {
           });
         }).error(function(err) {
           console.error(err);
-          sendError(res, 500, '데이터 저장 실패');
+          sendError(res, '데이터 저장 실패');
         });
       } else {
         console.error('회원 정보 없음');
-        sendError(res, 400, '회원 정보 없음');
+        sendError(res, '잘못된 토큰입니다. 로그인을 새로 시도해주세요.');
       }
     }).error(function(err) {
       console.error(err);
-      sendError(res, 500, '서버 오류');
+      sendError(res, '서버 오류');
     });
   },
 
@@ -171,7 +167,7 @@ exports.handlers = handlers = {
       });
     }).error(function(err) {
       console.error(err);
-      sendError(res, 500, '서버 오류');
+      sendError(res, '서버 오류');
     });
   },
 
@@ -183,7 +179,7 @@ exports.handlers = handlers = {
       });
     }).error(function(err) {
       console.error(err);
-      sendError(res, 500, '서버 오류');
+      sendError(res, '서버 오류');
     });
   },
 
@@ -210,7 +206,7 @@ exports.handlers = handlers = {
       });
     }).error(function(err) {
       console.error(err);
-      sendError(res, 500, '서버 오류');
+      sendError(res, '서버 오류');
     });
   },
 
@@ -226,14 +222,14 @@ exports.handlers = handlers = {
           });
         }).error(function(err) {
           console.error(err);
-          sendError(res, 500, '서버 오류');
+          sendError(res, '서버 오류');
         });
       } else {
-        sendError(res, 404, '존재하지 않는 유저');
+        sendError(res, '존재하지 않는 사용자입니다. user_id를 확인해주세요.');
       }
     }).error(function(err) {
       console.error(err);
-      sendError(res, 500, '서버 오류');
+      sendError(res, '서버 오류');
     })
   },
 
