@@ -91,8 +91,8 @@ describe('Routing > ', function() {
       helper.clearData(function(err) {
         helper.loadSeedData(function(err) {
           helper.getUserValueInDatabase(function(err, userValue) {
-            userId = userValue.user_id
-            token = userValue.token
+            userId = userValue.user_id;
+            token = userValue.token;
             done();
           });
         });
@@ -131,43 +131,14 @@ describe('Routing > ', function() {
     });
 
     it('보블 정보를 반환한다', function(done) {
-      var data = {
-        latitude: '20.22',
-        longitude: '50.5'
-      };
-
       request(url)
-        .get('/vobbles')
-        .send(data)
+        .get('/vobbles?latitude=30&longitude=40')
         .end(function(err, res) {
           if (err) {
             throw err;
           }
           res.should.have.status(200);
           res.body.should.have.property('vobbles');
-          done();
-        });
-    });
-  });
-
-  describe('GET /vobbles/count > ', function() {
-    before(function(done) {
-      helper.clearData(function(err) {
-        helper.loadSeedData(function(err) {
-          done();
-        });
-      });
-    });
-
-    it('모든 보블의 갯수를 반환한다', function(done) {
-      request(url)
-        .get('/vobbles/count')
-        .end(function(err, res) {
-          if (err) {
-            throw err;
-          }
-          res.should.have.status(200);
-          res.body.should.have.property('count');
           done();
         });
     });
@@ -188,49 +159,14 @@ describe('Routing > ', function() {
     });
 
     it('해당 유저의 보블 중 현재 위치에서 가장 가까운 n개의 보블 정보를 반환한다', function(done) {
-      var data = {
-        latitude: '20.22',
-        longitude: '50.5',
-        limit: 6
-      };
-
       request(url)
-        .get('/users/' + userId + '/vobbles')
-        .send(data)
+        .get('/users/' + userId + '/vobbles?latitude=30&longitude=40')
         .end(function(err, res) {
           if (err) {
             throw err;
           }
           res.should.have.status(200);
           res.body.should.have.property('vobbles');
-          done();
-        });
-    });
-  });
-
-  describe('GET /users/:user_id/vobbles/count > ', function() {
-    var userId;
-
-    before(function(done) {
-      helper.clearData(function(err) {
-        helper.loadSeedData(function(err) {
-          helper.getUserValueInDatabase(function(err, userValue) {
-            userId = userValue.user_id;
-            done();
-          });
-        });
-      });
-    });
-
-    it('해당 유저의 모든 보블의 갯수를 반환한다', function(done) {
-      request(url)
-        .get('/users/' + userId + '/vobbles/count')
-        .end(function(err, res) {
-          if (err) {
-            throw err;
-          }
-          res.should.have.status(200);
-          res.body.should.have.property('count');
           done();
         });
     });

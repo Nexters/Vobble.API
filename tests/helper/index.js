@@ -66,13 +66,13 @@ exports.getUserValueInDatabase = function(callback) {
     callback(null, user.values);
   }).error(function(err) {
     callback(err);
-  })
+  });
 };
 
 exports.getVoiceFilePathForTesting = function() {
-  return __dirname + '/files/voice_sample.mp3';
+  return __dirname + '/test_files/voice_sample.mp3';
 };
 
 exports.getImageFilePathForTesting = function() {
-  return __dirname + '/files/image_sample.png';
+  return __dirname + '/test_files/image_sample.png';
 };
