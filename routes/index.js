@@ -16,14 +16,9 @@ exports.init = function(app) {
   app.get('/', handlers.index);
   app.post('/users', handlers.createUsers);
   app.post('/tokens', handlers.createTokens);
-
   app.get('/vobbles', handlers.getVobbles);
-  app.get('/vobbles/count', handlers.getVobblesCount);
-
   app.post('/users/:user_id/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
-  app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
-
   app.get('/files/:filename', handlers.downloadFile);
 };
 
@@ -170,18 +165,6 @@ exports.handlers = handlers = {
     });
   },
 
-  getVobblesCount: function(req, res) {
-    Vobble.findAll().success(function(vobbles) {
-      res.send(200, {
-        result: 1,
-        count: vobbles.length
-      });
-    }).error(function(err) {
-      console.error(err);
-      sendError(res, '서버 오류');
-    });
-  },
-
   getUserVobbles: function(req, res) {
     var latitude = req.body.latitude
       , longitude = req.body.longitude
@@ -207,29 +190,6 @@ exports.handlers = handlers = {
       console.error(err);
       sendError(res, '서버 오류');
     });
-  },
-
-  getUserVobblesCount: function(req, res) {
-    var userId = req.params.user_id;
-
-    User.find(userId).success(function(user) {
-      if (user) {
-        Vobble.findAll({ where: { user_id: userId } }).success(function(vobbles) {
-          res.send(200, {
-            result: 1,
-            count: vobbles.length
-          });
-        }).error(function(err) {
-          console.error(err);
-          sendError(res, '서버 오류');
-        });
-      } else {
-        sendError(res, '존재하지 않는 사용자입니다. user_id를 확인해주세요.');
-      }
-    }).error(function(err) {
-      console.error(err);
-      sendError(res, '서버 오류');
-    })
   },
 
   downloadFile: function(req, res) {

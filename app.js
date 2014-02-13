@@ -13,12 +13,12 @@ if (app.get('env') === 'development') {
 
 /* 테스트 서버 환경 설정 */
 if (app.get('env') === 'test') {
-  app.set('config', require('./config/test.json'));
+  // app.set('config', require('./config/test.json'));
 }
 
 /* 실 서버 환경 설정 */
 if (app.get('env') === 'production') {
-
+  // app.set('config', require('./config/production.json'));
 }
 
 /* 공통 환경 설정 */
