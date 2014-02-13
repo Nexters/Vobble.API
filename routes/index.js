@@ -140,9 +140,9 @@ exports.handlers = handlers = {
   },
 
   getVobbles: function(req, res) {
-    var latitude = req.body.latitude
-      , longitude = req.body.longitude
-      , limit = req.body.limit ? req.body.limit : 6;
+    var latitude = req.query.latitude
+      , longitude = req.query.longitude
+      , limit = req.query.limit ? req.query.limit : 6;
 
     var queryString = 'SELECT *, ' +
                       '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians(' + latitude + ') )' +
@@ -166,9 +166,9 @@ exports.handlers = handlers = {
   },
 
   getUserVobbles: function(req, res) {
-    var latitude = req.body.latitude
-      , longitude = req.body.longitude
-      , limit = req.body.limit ? req.body.limit : 6
+    var latitude = req.query.latitude
+      , longitude = req.query.longitude
+      , limit = req.query.limit ? req.query.limit : 6
       , userId = req.params.user_id;
 
     var queryString = 'SELECT *, ' +
