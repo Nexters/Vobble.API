@@ -76,18 +76,18 @@ exports.handlers = handlers = {
 
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
-        user.verifyPassword(password, function(err, result) {
-          if (!result) {
-            sendError(res, '패스워드가 일치하지 않습니다. 다시 확인해 주세요.');
-          } else {
-            res.send(200, {
-              result: 1,
-              user_id: user.user_id,
-              token: user.token
-            });
-          }
-        });
+        if (user.authenticate(password)) {
+          res.send(200, {
+            result: 1,
+            user_id: user.user_id,
+            token: user.token
+          });
+        } else {
+          console.error('패스워드 불일치');
+          sendError(res, '패스워드가 일치하지 않습니다. 다시 확인해 주세요.');
+        }
       } else {
+        console.error('유저 정보 없음');
         sendError(res, '정보자 존재하지 않습니다. 회원가입 후 로그인 해주세요.');
       }
     }).error(function(err) {

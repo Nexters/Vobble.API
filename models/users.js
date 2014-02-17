@@ -1,6 +1,10 @@
 'use strict';
 
-var bcrypt = require('bcrypt');
+var crypto = require('crypto');
+
+var encryptPassword = function(password) {
+  return crypto.createHmac('sha1', 'Vobble_API').update(password).digest('hex');
+};
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('users', {
@@ -36,18 +40,14 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'users',
 
     setterMethods: {
-      password: function(p) {
-        var salt = bcrypt.genSaltSync(10)
-          , hash = bcrypt.hashSync(p, salt);
-        return this.setDataValue('password', hash);
+      password: function(password) {
+        return this.setDataValue('password', encryptPassword(password));
       }
     },
 
     instanceMethods: {
-      verifyPassword: function(password, done) {
-        return bcrypt.compare(password, this.password, function(err, res) {
-          return done(err, res);
-        });
+      authenticate: function(plainText) {
+        return encryptPassword(plainText) === this.password;
       }
     }
   });

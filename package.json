@@ -4,8 +4,7 @@
   "dependencies": {
     "express": "3.4.x",
     "mysql": "2.0.x",
-    "sequelize": "2.0.x",
-    "bcrypt": "0.7.x"
+    "sequelize": "2.0.x"
   },
   "devDependencies": {
     "mocha": "*",
