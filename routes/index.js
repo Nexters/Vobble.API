@@ -17,6 +17,7 @@ exports.init = function(app) {
   app.post('/users', handlers.createUsers);
   app.post('/tokens', handlers.createTokens);
   app.get('/vobbles', handlers.getVobbles);
+  app.get('/users/:user_id', handlers.getUsers);
   app.post('/users/:user_id/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
   app.get('/files/:filename', handlers.downloadFile);
@@ -87,6 +88,29 @@ exports.handlers = handlers = {
         });
       } else {
         sendError(res, '정보자 존재하지 않습니다. 회원가입 후 로그인 해주세요.');
+      }
+    }).error(function(err) {
+      console.error(err);
+      sendError(res, '서버 오류');
+    });
+  },
+
+  getUsers: function(req, res) {
+    var userId = req.params.user_id;
+
+    User.find(userId).success(function(user) {
+      if (user) {
+        res.send(200, {
+          result: 1,
+          user: {
+            user_id: user.values.user_id,
+            email: user.values.email,
+            username: user.values.username
+          }
+        });
+      } else {
+        console.error('유저 정보 없음');
+        sendError(res, '유저 정보가 없습니다.');
       }
     }).error(function(err) {
       console.error(err);

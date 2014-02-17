@@ -83,6 +83,34 @@ describe('Routing > ', function() {
     });
   });
 
+  describe('GET /users/:user_id', function() {
+    var userId;
+
+    before(function(done) {
+      helper.clearData(function(err) {
+        helper.loadSeedData(function(err) {
+          helper.getUserValueInDatabase(function(err, userValue) {
+            userId = userValue.user_id;
+            done();
+          });
+        });
+      });
+    });
+
+    it('유저 정보를 얻는다', function(done) {
+      request(url)
+        .get('/users/' + userId)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          res.body.should.have.property('user');
+          done();
+        });
+    });
+  });
+
   describe('POST /users/:user_id/vobbles > ', function() {
     var userId
       , token;
