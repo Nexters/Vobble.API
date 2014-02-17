@@ -53,6 +53,34 @@ describe('Routing > ', function() {
     });
   });
 
+  describe('GET /users/:user_id', function() {
+    var userId;
+
+    before(function(done) {
+      helper.clearData(function(err) {
+        helper.loadSeedData(function(err) {
+          helper.getUserValueInDatabase(function(err, userValue) {
+            userId = userValue.user_id;
+            done();
+          });
+        });
+      });
+    });
+
+    it('유저 정보를 얻는다', function(done) {
+      request(url)
+        .get('/users/' + userId)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          res.body.should.have.property('user');
+          done();
+        });
+    });
+  });
+
   describe('POST /tokens > ', function() {
     before(function(done) {
       helper.clearData(function(err) {
@@ -78,34 +106,6 @@ describe('Routing > ', function() {
           res.should.have.status(200);
           res.body.should.have.property('token');
           res.body.should.have.property('user_id');
-          done();
-        });
-    });
-  });
-
-  describe('GET /users/:user_id', function() {
-    var userId;
-
-    before(function(done) {
-      helper.clearData(function(err) {
-        helper.loadSeedData(function(err) {
-          helper.getUserValueInDatabase(function(err, userValue) {
-            userId = userValue.user_id;
-            done();
-          });
-        });
-      });
-    });
-
-    it('유저 정보를 얻는다', function(done) {
-      request(url)
-        .get('/users/' + userId)
-        .end(function(err, res) {
-          if (err) {
-            throw err;
-          }
-          res.should.have.status(200);
-          res.body.should.have.property('user');
           done();
         });
     });
@@ -198,5 +198,43 @@ describe('Routing > ', function() {
           done();
         });
     });
+  });
+
+  describe('DELETE /users/:user_id/vobbles/:vobble_id > ', function() {
+    var userId
+      , token
+      , vobbleId;
+
+    before(function(done) {
+      helper.clearData(function(err) {
+        helper.loadSeedData(function(err) {
+          helper.getUserValueInDatabase(function(err, userValue) {
+            userId = userValue.user_id;
+            token = userValue.token;
+            helper.getVobbleValueInDatabase(userId, function(err, vobbleValue) {
+              vobbleId = vobbleValue.vobble_id;
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('보블을 삭제한다.', function(done) {
+      var data = {
+        token: token
+      };
+      request(url)
+        .del('/users/' + userId + '/vobbles/' + vobbleId)
+        .send(data)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          done();
+        });
+    });
+
   });
 });

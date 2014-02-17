@@ -15,11 +15,12 @@ exports.init = function(app) {
 
   app.get('/', handlers.index);
   app.post('/users', handlers.createUsers);
+  app.get('/users/:user_id', handlers.getUsers);
   app.post('/tokens', handlers.createTokens);
   app.get('/vobbles', handlers.getVobbles);
-  app.get('/users/:user_id', handlers.getUsers);
   app.post('/users/:user_id/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
+  app.delete('/users/:user_id/vobbles/:vobble_id', handlers.deleteVobbles);
   app.get('/files/:filename', handlers.downloadFile);
 };
 
@@ -210,6 +211,48 @@ exports.handlers = handlers = {
         result: 1,
         vobbles: vobblesValue
       });
+    }).error(function(err) {
+      console.error(err);
+      sendError(res, '서버 오류');
+    });
+  },
+
+  deleteVobbles: function(req, res) {
+    var token = req.body.token
+      , userId = req.params.user_id
+      , vobbleId = req.params.vobble_id;
+
+    User.find(userId).success(function(user) {
+      if (user) {
+        if (user.values.token !== token) {
+          console.error('권한 없음');
+          sendError(res, '권한이 없습니다.');
+          return;
+        }
+        Vobble.find(vobbleId).success(function(vobble) {
+          var voiceName = vobble.values.voice_uri
+            , imageName = vobble.values.image_uri
+            , voiceFilePath = path.join(__dirname, '../files', voiceName)
+            , imageFilePath = path.join(__dirname, '../files', imageName);
+
+          vobble.destroy().success(function() {
+            fs.unlink(voiceFilePath, function() {
+              fs.unlink(imageFilePath, function() {
+                res.send(200, { result: 1 });
+              });
+            });
+          }).error(function(err) {
+            console.error(err);
+            sendError(res, '서버 오류');
+          });
+        }).error(function(err) {
+          console.error(err);
+          sendError(res, '서버 오류');
+        });
+      } else {
+        console.error('유저 정보 없음');
+        sendError(res, '존재하지 않는 유저의 id입니다.');
+      }
     }).error(function(err) {
       console.error(err);
       sendError(res, '서버 오류');

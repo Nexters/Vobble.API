@@ -1,6 +1,7 @@
 'use strict';
 
 var Sequelize = require('sequelize')
+  , fs = require('fs')
   , sequelize
   , models;
 
@@ -32,7 +33,8 @@ exports.getUserValueForTesting = function() {
   return {
     email: 'test@vobble.com',
     password: 'password',
-    username: 'test user'
+    username: 'test user',
+    token: 'test token'
   };
 };
 
@@ -42,13 +44,13 @@ exports.loadSeedData = function(callback) {
   var vobbleValue = {
     latitude: '30',
     longitude: '100',
-    voice_uri: 'mockVoice.m4a',
-    image_uri: 'mockImage.jpg'
+    voice_uri: 'voice_sample.mp3',
+    image_uri: 'image_sample.png'
   };
 
   this.clearData(function(err) {
     models.User.create(userValue).success(function(user) {
-      vobbleValue.userId = user.values.user_id;
+      vobbleValue.user_id = user.values.user_id;
       models.Vobble.create(vobbleValue).success(function() {
         callback(null);
       }).error(function(err) {
@@ -64,6 +66,14 @@ exports.getUserValueInDatabase = function(callback) {
   var userEmail = this.getUserValueForTesting().email;
   models.User.find({ where: { email: userEmail } }).success(function(user) {
     callback(null, user.values);
+  }).error(function(err) {
+    callback(err);
+  });
+};
+
+exports.getVobbleValueInDatabase = function(userId, callback) {
+  models.Vobble.find({ where: { user_id: userId } }).success(function(vobble) {
+    callback(null, vobble.values);
   }).error(function(err) {
     callback(err);
   });
