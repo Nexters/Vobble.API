@@ -14,13 +14,15 @@ exports.init = function(app) {
 
 exports.registerAndGetModels = function(sequelize) {
   var User = sequelize.import(__dirname + '/users')
-    , Vobble = sequelize.import(__dirname + '/vobbles');
+    , Vobble = sequelize.import(__dirname + '/vobbles')
+    , Event = sequelize.import(__dirname + '/events');
 
   // 유저-보블 1:M 관계
   User.hasMany(Vobble);
 
   return {
     User: User,
-    Vobble: Vobble
+    Vobble: Vobble,
+    Event: Event
   };
 };

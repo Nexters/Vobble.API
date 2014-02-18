@@ -172,6 +172,29 @@ describe('Routing > ', function() {
     });
   });
 
+  describe('GET /vobbles/count > ', function() {
+    before(function(done) {
+      helper.clearData(function(err) {
+        helper.loadSeedData(function(err) {
+          done();
+        });
+      });
+    });
+
+    it('보블의 전체 갯수를 반환한다', function(done) {
+      request(url)
+        .get('/vobbles/count')
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          res.body.should.have.property('count');
+          done();
+        });
+    });
+  });
+
   describe('GET /users/:user_id/vobbles > ', function() {
     var userId;
 
@@ -195,6 +218,34 @@ describe('Routing > ', function() {
           }
           res.should.have.status(200);
           res.body.should.have.property('vobbles');
+          done();
+        });
+    });
+  });
+
+  describe('GET /users/:user_id/vobbles/count > ', function() {
+    var userId;
+
+    before(function(done) {
+      helper.clearData(function(err) {
+        helper.loadSeedData(function(err) {
+          helper.getUserValueInDatabase(function(err, userValue) {
+            userId = userValue.user_id;
+            done();
+          });
+        });
+      });
+    });
+
+    it('해당 유저가 올린 보블의 전체 갯수를 반환한다', function(done) {
+      request(url)
+        .get('/users/' + userId + '/vobbles/count')
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          res.body.should.have.property('count');
           done();
         });
     });

@@ -4,6 +4,7 @@ var express = require('express')
   , app = express()
   , url = require('url')
   , fs = require('fs')
+  , path = require('path')
   , uploadDir = __dirname + '/files';
 
 /* 로컬 개발 환경 설정 */
@@ -23,6 +24,10 @@ if (app.get('env') === 'production') {
 
 /* 공통 환경 설정 */
 app.set('port', process.env.PORT || 3000);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.limit('5mb'));
 app.use(express.bodyParser({uploadDir: uploadDir}));
 app.use(express.methodOverride());

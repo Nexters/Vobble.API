@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  div(data-theme="b" data-role="header" data-position="fixed")
+    h3 보블 이벤트
+
+  div(data-role="content")
+    div(data-role="collapsible-set")
+      each event in events
+        div(data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right")
+          h4 #{event.title}
+          p #{event.content}

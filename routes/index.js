@@ -6,22 +6,30 @@ var crypto = require('crypto')
   , sequelize
   , User
   , Vobble
+  , Event
   , handlers;
 
 exports.init = function(app) {
   sequelize = app.get('sequelize');
   User = app.get('db').User;
   Vobble = app.get('db').Vobble;
+  Event = app.get('db').Event;
 
+  /* API */
   app.get('/', handlers.index);
   app.post('/users', handlers.createUsers);
   app.get('/users/:user_id', handlers.getUsers);
   app.post('/tokens', handlers.createTokens);
   app.get('/vobbles', handlers.getVobbles);
+  app.get('/vobbles/count', handlers.getVobblesCount);
   app.post('/users/:user_id/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
+  app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
   app.delete('/users/:user_id/vobbles/:vobble_id', handlers.deleteVobbles);
   app.get('/files/:filename', handlers.downloadFile);
+
+  /* Web */
+  app.get('/events', handlers.events);
 };
 
 function sendError(res, errMsg) {
@@ -190,6 +198,18 @@ exports.handlers = handlers = {
     });
   },
 
+  getVobblesCount: function(req, res) {
+    Vobble.findAll().success(function(vobbles) {
+      res.send(200, {
+        result: 1,
+        count: vobbles.length
+      });
+    }).error(function(err) {
+      console.error(err);
+      sendError(res, '서버 오류');
+    });
+  },
+
   getUserVobbles: function(req, res) {
     var latitude = req.query.latitude
       , longitude = req.query.longitude
@@ -211,6 +231,30 @@ exports.handlers = handlers = {
         result: 1,
         vobbles: vobblesValue
       });
+    }).error(function(err) {
+      console.error(err);
+      sendError(res, '서버 오류');
+    });
+  },
+
+  getUserVobblesCount: function(req, res) {
+    var userId = req.params.user_id;
+
+    User.find(userId).success(function(user) {
+      if (user) {
+        Vobble.findAll({ where: { user_id: userId } }).success(function(vobbles) {
+          res.send(200, {
+            result: 1,
+            count: vobbles.length
+          });
+        }).error(function(err) {
+          console.error(err);
+          sendError(res, '서버 오류');
+        });
+      } else {
+        console.error('존재하지 않는 유저');
+        sendError(res, '존재하지 않는 유저입니다.');
+      }
     }).error(function(err) {
       console.error(err);
       sendError(res, '서버 오류');
@@ -264,5 +308,24 @@ exports.handlers = handlers = {
       , filepath = path.join(__dirname, '../files', filename);
 
     res.download(filepath);
+  },
+
+  events: function(req, res) {
+    var data = {
+      events: []
+    };
+
+    Event.findAll({ order: 'id DESC' }).success(function(events) {
+      events.map(function(event) {
+        var eventValue = {};
+        eventValue.title = event.values.title;
+        eventValue.content = event.values.content;
+        data.events.push(eventValue);
+      });
+      res.render('events', data);
+    }).error(function(err) {
+      console.error(err);
+      sendError(res, '서버 오류');
+    });
   }
 };
