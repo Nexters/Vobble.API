@@ -251,7 +251,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe('DELETE /users/:user_id/vobbles/:vobble_id > ', function() {
+  describe.only('POST /users/:user_id/vobbles/:vobble_id/delete > ', function() {
     var userId
       , token
       , vobbleId;
@@ -276,7 +276,7 @@ describe('Routing > ', function() {
         token: token
       };
       request(url)
-        .del('/users/' + userId + '/vobbles/' + vobbleId)
+        .post('/users/' + userId + '/vobbles/' + vobbleId + '/delete')
         .send(data)
         .end(function(err, res) {
           if (err) {

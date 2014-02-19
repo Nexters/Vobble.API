@@ -25,7 +25,7 @@ exports.init = function(app) {
   app.post('/users/:user_id/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
   app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
-  app.delete('/users/:user_id/vobbles/:vobble_id', handlers.deleteVobbles);
+  app.post('/users/:user_id/vobbles/:vobble_id/delete', handlers.deleteVobbles);
   app.get('/files/:filename', handlers.downloadFile);
 
   /* Web */
