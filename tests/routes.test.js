@@ -251,7 +251,7 @@ describe('Routing > ', function() {
     });
   });
 
-  describe.only('POST /users/:user_id/vobbles/:vobble_id/delete > ', function() {
+  describe('POST /users/:user_id/vobbles/:vobble_id/delete > ', function() {
     var userId
       , token
       , vobbleId;

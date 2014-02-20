@@ -178,16 +178,15 @@ exports.handlers = handlers = {
       , limit = req.query.limit ? req.query.limit : 6;
 
     var queryString = 'SELECT *, ' +
-                      '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians(' + latitude + ') )' +
-                      ' * cos( radians('+ longitude +') - radians(' + longitude + ') ) + sin( radians(' + latitude +
-                      ') ) * sin( radians(' + latitude + ') ) ) ) ' +
+                      '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
+                      ' * cos( radians( longitude ) - radians(' + longitude + ') )' +
+                      ' + sin( radians(' + latitude + ') ) * sin( radians( latitude ) ) ) ) ' +
                       'AS distance FROM vobbles ORDER BY distance LIMIT 0, ' + limit;
 
     sequelize.query(queryString, Vobble).success(function(vobbles) {
       var vobblesValue = vobbles.map(function(vobble) {
         return vobble.values;
       });
-
       res.send(200, {
         result: 1,
         vobbles: vobblesValue
@@ -218,15 +217,14 @@ exports.handlers = handlers = {
 
     var queryString = 'SELECT *, ' +
                       '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
-                      ' * cos( radians( longitude ) - radians(' + longitude + ') ) + sin( radians(' + latitude +
-                      ') ) * sin( radians( latitude ) ) ) ) ' +
+                      ' * cos( radians( longitude ) - radians(' + longitude + ') )' +
+                      ' + sin( radians(' + latitude + ') ) * sin( radians( latitude ) ) ) ) ' +
                       'AS distance FROM vobbles WHERE user_id = ' + userId + ' ORDER BY distance LIMIT 0, ' + limit;
 
     sequelize.query(queryString, Vobble).success(function(vobbles) {
       var vobblesValue = vobbles.map(function(vobble) {
         return vobble.values;
       });
-
       res.send(200, {
         result: 1,
         vobbles: vobblesValue
@@ -274,21 +272,26 @@ exports.handlers = handlers = {
           return;
         }
         Vobble.find(vobbleId).success(function(vobble) {
-          var voiceName = vobble.values.voice_uri
-            , imageName = vobble.values.image_uri
-            , voiceFilePath = path.join(__dirname, '../files', voiceName)
-            , imageFilePath = path.join(__dirname, '../files', imageName);
+          if (vobble) {
+            var voiceName = vobble.values.voice_uri
+              , imageName = vobble.values.image_uri
+              , voiceFilePath = path.join(__dirname, '../files', voiceName)
+              , imageFilePath = path.join(__dirname, '../files', imageName);
 
-          vobble.destroy().success(function() {
-            fs.unlink(voiceFilePath, function() {
-              fs.unlink(imageFilePath, function() {
-                res.send(200, { result: 1 });
+            vobble.destroy().success(function() {
+              fs.unlink(voiceFilePath, function() {
+                fs.unlink(imageFilePath, function() {
+                  res.send(200, { result: 1 });
+                });
               });
+            }).error(function(err) {
+              console.error(err);
+              sendError(res, '서버 오류');
             });
-          }).error(function(err) {
-            console.error(err);
-            sendError(res, '서버 오류');
-          });
+          } else {
+            console.error('존재하지 않는 보블');
+            sendError(res, '해당 보블이 존재하지 않습니다.');
+          }
         }).error(function(err) {
           console.error(err);
           sendError(res, '서버 오류');
