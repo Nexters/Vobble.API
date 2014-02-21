@@ -16,7 +16,7 @@ exports.init = function(app) {
   Event = app.get('db').Event;
 
   /* API */
-  app.get('/', handlers.index);
+  app.get('/ping', handlers.ping);
   app.post('/users', handlers.createUsers);
   app.get('/users/:user_id', handlers.getUsers);
   app.post('/tokens', handlers.createTokens);
@@ -27,7 +27,7 @@ exports.init = function(app) {
   app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
   app.post('/users/:user_id/vobbles/:vobble_id/delete', handlers.deleteVobbles);
   app.get('/files/:filename', handlers.downloadFile);
-
+  app.get('/',handlers.index)
   /* Web */
   app.get('/events', handlers.events);
 };
@@ -41,6 +41,9 @@ function sendError(res, errMsg) {
 
 exports.handlers = handlers = {
   index: function(req, res) {
+    res.render('index', { title: 'vobble', layout: false});
+  },
+  ping: function(req, res) {
     res.send(200, '살아있음');
   },
 

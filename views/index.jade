@@ -1,0 +1,45 @@
+!!! 5
+html(xmlns="http://www.w3.org/1999/xhtml" ,xml:lang="en" , dir="ltr" , lang="en-US", xmlns:fb="https://www.facebook.com/2008/fbml", xmlns:og="http://opengraphprotocol.org/schema/")
+  head(prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# soundig: http://ogp.me/ns/fb/soundig#")
+    title Vobble
+    meta(charset='utf-8')
+    meta(property ="description", content="보블보블")
+    meta(property ="fb:app_id", content="000")
+    meta(property ="og:title",content="보블보블보블보블 타이틀")
+    meta(property ="fb:admins", content="100001601537277")
+    meta(property ="og:type", content="s")
+    meta(property ="og:description", content= "보블보블쁠")
+    meta(property ="og:image", content="54.199.171.240:3000/images/intro.png")
+    meta(property ="og:video:type", content="application/x-shockwave-flash")
+    meta(property ="og:video:height", content="480")
+    meta(property ="og:video:width", content="640")
+    meta(property ="og:video", content="http://www.youtube.com/watch?v=kjt7Y8VPaQw&feature=youtu.be")
+    link(rel ="shortcut icon", href="../images/icon.png")
+
+    link(rel='stylesheet', href='../stylesheets/index.css')
+    script(type='text/javascript')
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/ko_KR/all.js#xfbml=1&appId=187092678165992";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+  body
+    div
+      div(class="body_wrap1")
+          div(class="content_wrap")
+            div.youtube_wrap
+              iframe(width="600px", height="400px", src="http://player.vimeo.com/video/87283705", frameborder="0", allowfullscreen)
+            a(href="http://itunes.apple.com/app/id528623678")
+              img(src="../images/appstore.png",id="iphone_button")
+            a(href="http://itunes.apple.com/app/id528623678")
+              img(src="../images/googleplay.png",id="android_button")
+            div.plugin_wrap
+              div.facebook_wrap
+                div.fb-root
+                div.fb-like(data-href="https://www.facebook.com/pages/Vobble/546094008822770",data-send="false",data-layout="standard",data-action="like",data-show-faces="true",data-share="true")
+
+          div(class="footer_wrap")
+            div(class="copywrite")
+              h3 © 2014 Vobble
