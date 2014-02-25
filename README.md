@@ -15,6 +15,8 @@ Vobble API Server (node.js)
 - sequelize
 - jade
 - validator
+- wingston
+- dateutil
 
 ### Development
 - mocha

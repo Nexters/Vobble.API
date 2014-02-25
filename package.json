@@ -6,7 +6,10 @@
     "mysql": "2.0.x",
     "sequelize": "2.0.x",
     "jade": "0.35.x",
-    "validator": "3.3.x"
+    "validator": "3.3.x",
+    "winston": "0.7.x",
+    "winston-loggly": "*",
+    "date-utils": "1.2.x"
   },
   "devDependencies": {
     "mocha": "*",

@@ -40,9 +40,13 @@ function sendError(res, errMsg) {
   });
 }
 
+function getLogFormat(req) {
+  return req.ip + ' - - "' + req.method + ' ' + req.path + '" ';
+}
+
 exports.handlers = handlers = {
   index: function(req, res) {
-    res.render('index', { title: 'vobble', layout: false});
+    res.render('index', { title: 'vobble', layout: false });
   },
 
   ping: function(req, res) {
@@ -55,13 +59,14 @@ exports.handlers = handlers = {
       , password = req.body.password;
 
     if (!validator.isEmail(email) || validator.isNull(username) || validator.isNull(password)) {
-      console.error('잘못된 요청');
+      logger.error(getLogFormat(req) + '잘못된 요청 / email: ' + email);
       sendError(res, '잘못된 요청입니다.');
       return;
     }
 
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
+        logger.error(getLogFormat(req) + '유저 생성 실패 / email: ' + email);
         sendError(res, '이메일이 존재합니다. 해당 이메일로 로그인하시거나 다른 이메일로 가입 해주세요.');
       } else {
         var token = crypto
@@ -77,14 +82,17 @@ exports.handlers = handlers = {
         };
 
         User.create(userData).success(function(user) {
+          logger.info(getLogFormat(req) + '유저 생성 성공 / user_id: ' + user.values.user_id);
           res.send(200, { result: 1, user_id: user.values.user_id });
         }).error(function(err) {
-          console.error(err);
+          logger.error(getLogFormat(req) + '유저 생성 실패 Sequelize 오류 / email: ' + email);
+          logger.error(err);
           sendError(res, '서버 오류');
         });
       }
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '유저 조회 실패 Sequelize 오류 / email: ' + email);
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
@@ -94,7 +102,7 @@ exports.handlers = handlers = {
       , password = req.body.password;
 
     if (!validator.isEmail(email) || validator.isNull(password)) {
-      console.error('잘못된 요청');
+      logger.error(getLogFormat(req) + '잘못된 요청 / email: ' + email);
       sendError(res, '잘못된 요청입니다.');
       return;
     }
@@ -102,21 +110,23 @@ exports.handlers = handlers = {
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
         if (user.authenticate(password)) {
+          logger.info(getLogFormat(req) + '유저 인증 성공 / user_id: ' + user.user_id);
           res.send(200, {
             result: 1,
             user_id: user.user_id,
             token: user.token
           });
         } else {
-          console.error('패스워드 불일치');
+          logger.error(getLogFormat(req) + '패스워드 불일치 / user_id: ' + user.user_id);
           sendError(res, '패스워드가 일치하지 않습니다. 다시 확인해 주세요.');
         }
       } else {
-        console.error('유저 정보 없음');
+        logger.error(getLogFormat(req) + '유저 정보 없음 / email: ' + email);
         sendError(res, '정보자 존재하지 않습니다. 회원가입 후 로그인 해주세요.');
       }
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '유저 조회 실패 Sequelize 오류 / email: ' + email);
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
@@ -124,8 +134,15 @@ exports.handlers = handlers = {
   getUsers: function(req, res) {
     var userId = req.params.user_id;
 
+    if (!validator.isNumeric(userId)) {
+      logger.error(getLogFormat(req) + '잘못된 요청 / user_id: ' + userId);
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
+
     User.find(userId).success(function(user) {
       if (user) {
+        logger.info(getLogFormat(req) + '유저 조회 성공 / user_id: ' + userId);
         res.send(200, {
           result: 1,
           user: {
@@ -135,11 +152,12 @@ exports.handlers = handlers = {
           }
         });
       } else {
-        console.error('유저 정보 없음');
+        logger.error(getLogFormat(req) + '유저 정보 없음 / user_id: ' + userId);
         sendError(res, '유저 정보가 없습니다.');
       }
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '유저 조회 실패 Sequelize 오류 / user_id: ' + userId);
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
@@ -157,7 +175,7 @@ exports.handlers = handlers = {
     if (validator.isNull(token) || !validator.isFloat(latitude) ||
       !validator.isFloat(longitude) || validator.isNull(voicePath) ||
       validator.isNull(imagePath) || !validator.isNumeric(userId)) {
-      console.error('잘못된 요청');
+      logger.error(getLogFormat(req) + '잘못된 요청 / user_id: ' + userId);
       sendError(res, '잘못된 요청입니다.');
       return;
     }
@@ -165,7 +183,7 @@ exports.handlers = handlers = {
     User.find({ where: { token: token } }).success(function(user) {
       if (user) {
         if (userId !== user.user_id + '') {
-          console.error('권한 없음');
+          logger.error(getLogFormat(req) + '권한 없음 / user_id: ' + userId);
           sendError(res, '권한이 없습니다.');
           return;
         }
@@ -179,20 +197,23 @@ exports.handlers = handlers = {
         };
 
         Vobble.create(data).success(function(vobble) {
+          logger.info(getLogFormat(req) + '보블 생성 성공 / user_id: ' + userId);
           res.send(200, {
             result: 1,
             vobble_id: vobble.vobble_id
           });
         }).error(function(err) {
-          console.error(err);
+          logger.error(getLogFormat(req) + '보블 생성 실패 Sequelize 오류 / user_id: ' + userId);
+          logger.error(err);
           sendError(res, '데이터 저장 실패');
         });
       } else {
-        console.error('회원 정보 없음');
+        logger.error(getLogFormat(req) + '유저 정보 없음 / user_id: ' + userId);
         sendError(res, '잘못된 토큰입니다. 로그인을 새로 시도해주세요.');
       }
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '유저 조회 실패 Sequelize 오류 / user_id: ' + userId);
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
@@ -203,7 +224,7 @@ exports.handlers = handlers = {
       , limit = req.query.limit ? req.query.limit : 6;
 
     if (!validator.isFloat(latitude) || !validator.isFloat(longitude) || !validator.isNumeric(limit)) {
-      console.error('잘못된 요청');
+      logger.error(getLogFormat(req) + '잘못된 요청');
       sendError(res, '잘못된 요청입니다.');
       return;
     }
@@ -218,24 +239,28 @@ exports.handlers = handlers = {
       var vobblesValue = vobbles.map(function(vobble) {
         return vobble.values;
       });
+      logger.info(getLogFormat(req) + '보블 조회 성공');
       res.send(200, {
         result: 1,
         vobbles: vobblesValue
       });
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '보블 조회 실패 Sequelize 오류');
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
 
   getVobblesCount: function(req, res) {
     Vobble.findAll().success(function(vobbles) {
+      logger.info(getLogFormat(req) + '보블 갯수 조회 성공');
       res.send(200, {
         result: 1,
         count: vobbles.length
       });
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '보블 갯수 조회 실패 Sequelize 오류');
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
@@ -247,7 +272,7 @@ exports.handlers = handlers = {
       , userId = req.params.user_id;
 
     if (!validator.isFloat(latitude) || !validator.isFloat(longitude) || !validator.isNumeric(limit) || !validator.isNumeric(userId)) {
-      console.error('잘못된 요청');
+      logger.error(getLogFormat(req) + '잘못된 요청 / user_id: ' + userId);
       sendError(res, '잘못된 요청입니다.');
       return;
     }
@@ -262,12 +287,14 @@ exports.handlers = handlers = {
       var vobblesValue = vobbles.map(function(vobble) {
         return vobble.values;
       });
+      logger.info(getLogFormat(req) + '보블 조회 성공 / user_id: ' + userId);
       res.send(200, {
         result: 1,
         vobbles: vobblesValue
       });
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '보블 조회 실패 Sequelize 오류 / user_id: ' + userId);
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
@@ -276,7 +303,7 @@ exports.handlers = handlers = {
     var userId = req.params.user_id;
 
     if (!validator.isNumeric(userId)) {
-      console.error('잘못된 요청');
+      logger.error(getLogFormat(req) + '잘못된 요청 / user_id: ' + userId);
       sendError(res, '잘못된 요청입니다.');
       return;
     }
@@ -284,20 +311,22 @@ exports.handlers = handlers = {
     User.find(userId).success(function(user) {
       if (user) {
         Vobble.findAll({ where: { user_id: userId } }).success(function(vobbles) {
+          logger.info(getLogFormat(req) + '보블 갯수 조회 성공 / user_id: ' + userId);
           res.send(200, {
             result: 1,
             count: vobbles.length
           });
         }).error(function(err) {
-          console.error(err);
+          logger.error(getLogFormat(req) + '보블 갯수 조회 실패 Sequlieze 오류 / user_id: ' + userId);
+          logger.error(err);
           sendError(res, '서버 오류');
         });
       } else {
-        console.error('존재하지 않는 유저');
+        logger.error(getLogFormat(req) + '유저 정보 없음 / user_id: ' + userId);
         sendError(res, '존재하지 않는 유저입니다.');
       }
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '유저 조회 실패 Sequelize 오류 / user_id: ' + userId);
       sendError(res, '서버 오류');
     });
   },
@@ -308,7 +337,7 @@ exports.handlers = handlers = {
       , vobbleId = req.params.vobble_id;
 
     if (validator.isNull(token) || !validator.isNumeric(userId) || !validator.isNumeric(vobbleId)) {
-      console.error('잘못된 요청');
+      logger.error(getLogFormat(req) + '잘못된 요청 / user_id: ' + userId);
       sendError(res, '잘못된 요청입니다.');
       return;
     }
@@ -316,7 +345,7 @@ exports.handlers = handlers = {
     User.find(userId).success(function(user) {
       if (user) {
         if (user.values.token !== token) {
-          console.error('권한 없음');
+          logger.error(getLogFormat(req) + '권한 없음 / user_id: ' + userId);
           sendError(res, '권한이 없습니다.');
           return;
         }
@@ -330,27 +359,31 @@ exports.handlers = handlers = {
             vobble.destroy().success(function() {
               fs.unlink(voiceFilePath, function() {
                 fs.unlink(imageFilePath, function() {
+                  logger.info(getLogFormat(req) + '보블 삭제 성공 / user_id: ' + userId + ', vobble_id: ' + vobbleId);
                   res.send(200, { result: 1 });
                 });
               });
             }).error(function(err) {
-              console.error(err);
+              logger.error(getLogFormat(req) + '보블 삭제 실패 Sequlize 오류 / user_id: ' + userId + ', vobble_id: ' + vobbleId);
+              logger.error(err);
               sendError(res, '서버 오류');
             });
           } else {
-            console.error('존재하지 않는 보블');
+            logger.error(getLogFormat(req) + '보블 정보 없음 / user_id: ' + userId + ', vobble_id: ' + vobbleId);
             sendError(res, '해당 보블이 존재하지 않습니다.');
           }
         }).error(function(err) {
-          console.error(err);
+          logger.error(getLogFormat(req) + '보블 조회 실패 Sequelize 오류 / user_id: ' + userId);
+          logger.error(err);
           sendError(res, '서버 오류');
         });
       } else {
-        console.error('유저 정보 없음');
+        logger.error(getLogFormat(req) + '유저 정보 없음 / user_id: ' + userId);
         sendError(res, '존재하지 않는 유저의 id입니다.');
       }
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '유저 조회 실패 Sequlize 오류 / user_id: ' + userId);
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   },
@@ -359,6 +392,7 @@ exports.handlers = handlers = {
     var filename = req.params.filename
       , filepath = path.join(__dirname, '../files', filename);
 
+    logger.info(getLogFormat(req) + '파일 다운로드 시작 / filename: ' + filename);
     res.download(filepath);
   },
 
@@ -374,9 +408,11 @@ exports.handlers = handlers = {
         eventValue.content = event.values.content;
         data.events.push(eventValue);
       });
+      logger.info(getLogFormat(req) + '이벤트 조회 성공');
       res.render('events', data);
     }).error(function(err) {
-      console.error(err);
+      logger.error(getLogFormat(req) + '이벤트 조회 실패 Sequelize 오류');
+      logger.error(err);
       sendError(res, '서버 오류');
     });
   }
