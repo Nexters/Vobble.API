@@ -5,7 +5,8 @@
     "express": "3.4.x",
     "mysql": "2.0.x",
     "sequelize": "2.0.x",
-    "jade": "0.35.x"
+    "jade": "0.35.x",
+    "validator": "3.3.x"
   },
   "devDependencies": {
     "mocha": "*",

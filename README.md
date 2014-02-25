@@ -13,7 +13,8 @@ Vobble API Server (node.js)
 - express
 - mysql
 - sequelize
-- bcrypt
+- jade
+- validator
 
 ### Development
 - mocha
