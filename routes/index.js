@@ -3,6 +3,7 @@
 var crypto = require('crypto')
   , path = require('path')
   , fs = require('fs')
+  , validator = require('validator')
   , sequelize
   , User
   , Vobble
@@ -27,8 +28,8 @@ exports.init = function(app) {
   app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
   app.post('/users/:user_id/vobbles/:vobble_id/delete', handlers.deleteVobbles);
   app.get('/files/:filename', handlers.downloadFile);
-  app.get('/',handlers.index)
   /* Web */
+  app.get('/',handlers.index);
   app.get('/events', handlers.events);
 };
 
@@ -43,14 +44,21 @@ exports.handlers = handlers = {
   index: function(req, res) {
     res.render('index', { title: 'vobble', layout: false});
   },
+
   ping: function(req, res) {
-    res.send(200, '살아있음');
+    res.send(200, 'pong');
   },
 
   createUsers: function(req, res) {
     var email = req.body.email
       , username = req.body.username
       , password = req.body.password;
+
+    if (!validator.isEmail(email) || validator.isNull(username) || validator.isNull(password)) {
+      console.error('잘못된 요청');
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
 
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
@@ -84,6 +92,12 @@ exports.handlers = handlers = {
   createTokens: function(req, res) {
     var email = req.body.email
       , password = req.body.password;
+
+    if (!validator.isEmail(email) || validator.isNull(password)) {
+      console.error('잘못된 요청');
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
 
     User.find({ where: { email: email } }).success(function(user) {
       if (user) {
@@ -135,10 +149,18 @@ exports.handlers = handlers = {
       , token = req.body.token
       , latitude = req.body.latitude
       , longitude = req.body.longitude
-      , voicePath = req.files.voice.path
+      , voicePath = req.files.voice ? req.files.voice.path : ''
       , voiceName = voicePath.substring(voicePath.lastIndexOf('/') + 1)
       , imagePath = req.files.image ? req.files.image.path : ''
       , imageName = imagePath ? imagePath.substring(imagePath.lastIndexOf('/') + 1) : '';
+
+    if (validator.isNull(token) || !validator.isFloat(latitude) ||
+      !validator.isFloat(longitude) || validator.isNull(voicePath) ||
+      validator.isNull(imagePath) || !validator.isNumeric(userId)) {
+      console.error('잘못된 요청');
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
 
     User.find({ where: { token: token } }).success(function(user) {
       if (user) {
@@ -180,6 +202,12 @@ exports.handlers = handlers = {
       , longitude = req.query.longitude
       , limit = req.query.limit ? req.query.limit : 6;
 
+    if (!validator.isFloat(latitude) || !validator.isFloat(longitude) || !validator.isNumeric(limit)) {
+      console.error('잘못된 요청');
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
+
     var queryString = 'SELECT *, ' +
                       '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
                       ' * cos( radians( longitude ) - radians(' + longitude + ') )' +
@@ -218,6 +246,12 @@ exports.handlers = handlers = {
       , limit = req.query.limit ? req.query.limit : 6
       , userId = req.params.user_id;
 
+    if (!validator.isFloat(latitude) || !validator.isFloat(longitude) || !validator.isNumeric(limit) || !validator.isNumeric(userId)) {
+      console.error('잘못된 요청');
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
+
     var queryString = 'SELECT *, ' +
                       '( 6371 * acos( cos( radians(' + latitude + ') ) * cos( radians( latitude ) )' +
                       ' * cos( radians( longitude ) - radians(' + longitude + ') )' +
@@ -240,6 +274,12 @@ exports.handlers = handlers = {
 
   getUserVobblesCount: function(req, res) {
     var userId = req.params.user_id;
+
+    if (!validator.isNumeric(userId)) {
+      console.error('잘못된 요청');
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
 
     User.find(userId).success(function(user) {
       if (user) {
@@ -266,6 +306,12 @@ exports.handlers = handlers = {
     var token = req.body.token
       , userId = req.params.user_id
       , vobbleId = req.params.vobble_id;
+
+    if (validator.isNull(token) || !validator.isNumeric(userId) || !validator.isNumeric(vobbleId)) {
+      console.error('잘못된 요청');
+      sendError(res, '잘못된 요청입니다.');
+      return;
+    }
 
     User.find(userId).success(function(user) {
       if (user) {
