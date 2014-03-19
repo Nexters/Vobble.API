@@ -27,6 +27,11 @@ module.exports = function(sequelize, DataTypes) {
     longitude: {
       type: DataTypes.FLOAT,
       allowNull: false
+    },
+
+    report_cnt: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     }
   }, {
     freezeTableName: true,

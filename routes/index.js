@@ -23,6 +23,7 @@ exports.init = function(app) {
   app.post('/tokens', handlers.createTokens);
   app.get('/vobbles', handlers.getVobbles);
   app.get('/vobbles/count', handlers.getVobblesCount);
+  app.post('/vobbles/:vobble_id/report', handlers.reportVobble);
   app.post('/users/:user_id/vobbles', handlers.createVobbles);
   app.get('/users/:user_id/vobbles', handlers.getUserVobbles);
   app.get('/users/:user_id/vobbles/count', handlers.getUserVobblesCount);
@@ -161,7 +162,29 @@ exports.handlers = handlers = {
       sendError(res, '서버 오류');
     });
   },
-
+  reportVobble: function(req, res) {
+    var vobbleId = req.params.vobble_id;
+    Vobble.find(vobbleId).success(function(vobble) {
+      console.log(vobble);
+      if(validator.isNull(vobble.report_cnt)){
+        vobble.report_cnt = 0;
+      }
+      vobble.updateAttributes({ report_cnt: vobble.report_cnt+1}).success(function(update_vobble){
+          res.send(200, {
+          result: 1,
+          vobble: update_vobble
+        });
+      }).error(function(error){
+        logger.error(getLogFormat(req) + '보블 업데이트 실패 Sequlize 오류 / vobbleId: ' + vobbleId);
+        logger.error(err);
+        sendError(res, '서버 오류');
+      });
+    }).error(function(err) {
+      logger.error(getLogFormat(req) + '보블 조회 실패 Sequlize 오류 / vobbleId: ' + vobbleId);
+      logger.error(err);
+      sendError(res, '서버 오류');
+    });
+  },
   createVobbles: function(req, res) {
     var userId = req.params.user_id
       , token = req.body.token
