@@ -130,7 +130,6 @@ describe('Routing > ', function() {
     it('보블을 생성한다', function(done) {
       var voiceFilePath = helper.getVoiceFilePathForTesting()
         , imageFilePath = helper.getImageFilePathForTesting();
-
       request(url)
         .post('/users/' + userId + '/vobbles')
         .field('token', token)

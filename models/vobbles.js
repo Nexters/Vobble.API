@@ -31,7 +31,7 @@ module.exports = function(sequelize, DataTypes) {
 
     report_cnt: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     }
   }, {
     freezeTableName: true,

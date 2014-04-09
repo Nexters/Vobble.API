@@ -15,7 +15,8 @@
     "mocha": "*",
     "should": "*",
     "supertest": "*",
-    "request": "2.27.x"
+    "request": "2.27.x",
+    "blanket": "~1.1.6"
   },
   "engines": {
     "node": ">=0.10.0",
@@ -23,4 +24,3 @@
   },
   "private": true
 }
-
